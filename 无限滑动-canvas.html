@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            background-color: #171717;
+            overflow: hidden;
+        }
+
+       /* 高级美观返回按钮 */
+.back-btn {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    padding: 12px 28px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #000000;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 999;
+    transition: all 0.25s ease;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    letter-spacing: 0.5px;
+}
+
+.back-btn:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+}
+
+.back-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+        .photobox {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+        
+        .photobox:active {
+            cursor: grabbing;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 新增：返回按钮 -->
+    <button class="back-btn">返回</button>
+
+    <canvas class="photobox"></canvas>
+</body>
+<script>
+ 
+    const photobox = {
+        canvas: {},
+        content: {},
+        img_total: 21,
+        row_max: 7,
+        line_max: 3,
+        img_width: Math.floor(700 / 2),
+        img_height: Math.floor(1000 / 2),
+        img_margin: 80,
+        img_radius: 40, 
+        
+        total_width: 0,
+        total_height: 0,
+        img_data: [],
+        if_movable: false,
+        
+        vx: 0,
+        vy: 0,
+        damping: 0.95,
+        isAnimating: false,
+        animationId: null,
+
+        init() {
+            this.canvas = document.querySelector(".photobox");
+            this.content = this.canvas.getContext("2d");
+            this.total_width = this.row_max * (this.img_width + this.img_margin) - this.img_margin;
+            this.total_height = this.line_max * (this.img_height + this.img_margin) - this.img_margin;
+            
+            this.resize();
+            this.creat_events();
+            this.creat_img_data();
+            this.animateLoop();
+            this.bindBackButton(); // 新增：绑定返回按钮事件
+        },
+        resize() {
+            this.canvas.width = this.canvas.clientWidth;
+            this.canvas.height = this.canvas.clientHeight;
+        },
+
+       creat_img_data() {
+        this.img_data = [];
+    
+        for (let i = 0; i < this.img_total; i++) {
+            let col_index = i % this.row_max;
+            let line_index = Math.floor(i / this.row_max);
+
+        let offset_x = line_index * 1; 
+        
+        let x = col_index * (this.img_width + this.img_margin) + offset_x;
+        let y = line_index * (this.img_height + this.img_margin);
+
+        let img_obj = { img: null, loaded: false, x: x, y: y };
+        this.img_data.push(img_obj);
+
+        let img = new Image();
+        img.src = `./photos/photo (${i + 1}).png`;
+        img.onload = () => {
+            let target = this.img_data.find(item => item.x === x && item.y === y);
+            if(target) {
+                target.img = img;
+                target.loaded = true;
+            }
+        };
+    }
+},
+
+        creat_events() {
+            window.addEventListener("resize", () => {
+                this.resize();
+            });
+
+            this.canvas.addEventListener("mousedown", (e) => {
+                this.if_movable = true;
+                this.vx = 0;
+                this.vy = 0;
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.isAnimating = false;
+                }
+            });
+
+            this.canvas.addEventListener("mouseup", (e) => {
+                this.if_movable = false;
+                this.check_img(e.x, e.y);
+                this.startDamping();
+            });
+
+            this.canvas.addEventListener("mouseleave", () => {
+                this.if_movable = false;
+                this.startDamping();
+            });
+
+            this.canvas.addEventListener("mousemove", (e) => {
+                if (!this.if_movable) return;
+                this.updatePositions(e.movementX, e.movementY);
+                this.vx = e.movementX;
+                this.vy = e.movementY;
+            });
+        },
+
+        animateLoop() {
+            this.render();
+            requestAnimationFrame(() => this.animateLoop());
+        },
+
+        updatePositions(x, y) {
+            this.img_data.forEach((img_obj) => {
+                img_obj.x += x;
+                img_obj.y += y;
+
+                if (img_obj.x > (this.total_width - this.img_width))
+                    img_obj.x -= this.total_width + this.img_margin;
+                if (img_obj.x < -this.img_width)
+                    img_obj.x += this.total_width + this.img_margin;
+                if (img_obj.y > (this.total_height - this.img_height))
+                    img_obj.y -= this.total_height + this.img_margin;
+                if (img_obj.y < -this.img_height)
+                    img_obj.y += this.total_height + this.img_margin;
+            });
+        },
+
+        render() {
+            this.content.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.img_data.forEach((img_obj) => {
+                if (img_obj.loaded) {
+                    this.content.save();
+                    this.content.beginPath();
+                    
+                    const x = img_obj.x;
+                    const y = img_obj.y;
+                    const w = this.img_width;
+                    const h = this.img_height;
+                    const r = this.img_radius;
+
+                    this.content.moveTo(x + r, y);
+                    this.content.lineTo(x + w - r, y);
+                    this.content.quadraticCurveTo(x + w, y, x + w, y + r);
+                    this.content.lineTo(x + w, y + h - r);
+                    this.content.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                    this.content.lineTo(x + r, y + h);
+                    this.content.quadraticCurveTo(x, y + h, x, y + h - r);
+                    this.content.lineTo(x, y + r);
+                    this.content.quadraticCurveTo(x, y, x + r, y);
+                    
+                    this.content.closePath();
+                    this.content.clip();
+
+                    this.content.drawImage(img_obj.img, x, y, w, h);
+                    
+                    this.content.restore();
+                }
+            });
+        },
+
+        startDamping() {
+            if (this.isAnimating || (Math.abs(this.vx) < 0.1 && Math.abs(this.vy) < 0.1)) return;
+            this.isAnimating = true;
+
+            const animate = () => {
+                this.vx *= this.damping;
+                this.vy *= this.damping;
+                this.updatePositions(this.vx, this.vy);
+
+                if (Math.abs(this.vx) < 0.01 && Math.abs(this.vy) < 0.01) {
+                    this.isAnimating = false;
+                    return;
+                }
+                this.animationId = requestAnimationFrame(animate);
+            };
+
+            animate();
+        },
+
+        check_img(x, y) {
+            let img = this.img_data.find(img =>
+                x >= img.x && x < img.x + this.img_width &&
+                y >= img.y && y < img.y + this.img_height
+            );
+            if (img && img.loaded) console.log(img, img.img);
+        },
+
+        // 新增：绑定返回按钮逻辑
+        bindBackButton() {
+            const backBtn = document.querySelector('.back-btn');
+            backBtn.addEventListener('click', () => {
+                // 默认逻辑：返回上一页
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    console.log('没有上一页记录，可在此处替换为跳转逻辑');
+                    // 示例：window.location.href = '/home'; 
+                }
+            });
+        }
+    };
+    photobox.init();
+</script>
+
+</html>

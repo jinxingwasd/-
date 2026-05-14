@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <!-- 元数据设置 -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BE WILD! CREATIVE! AND COOL!</title>
+    
+    <!-- 1. 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. 引入 GSAP 核心库 -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    
+    <!-- 3. 引入 Lenis 平滑滚动 -->
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js"></script>
+
+    <!-- Tailwind 自定义配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    // 自定义颜色
+                    colors: {
+                        brandBlue: '#008cff',
+                        darkBg: '#0f0f0f',
+                    },
+                    // 自定义字体
+                    fontFamily: {
+                        boldSans: ['Anton', 'Impact', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- 引入自定义 CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        #titleContainer {
+            perspective: 1000px;
+        }
+        
+        #titlePlane {
+            transform-style: preserve-3d;
+            transition: transform 0.15s ease-out;
+            will-change: transform;
+        }
+        
+        .hover-glow {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .hover-glow:hover {
+            color: #ffffff;
+            text-shadow: 
+                0 0 10px #008cff,
+                0 0 20px #008cff,
+                0 0 30px #008cff,
+                0 0 40px #008cff,
+                0 0 60px #008cff;
+            animation: glow-pulse 1s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow-pulse {
+            from {
+                text-shadow: 
+                    0 0 10px #008cff,
+                    0 0 20px #008cff,
+                    0 0 30px #008cff,
+                    0 0 40px #008cff,
+                    0 0 60px #008cff;
+            }
+            to {
+                text-shadow: 
+                    0 0 20px #008cff,
+                    0 0 30px #008cff,
+                    0 0 40px #008cff,
+                    0 0 50px #008cff,
+                    0 0 70px #008cff,
+                    0 0 90px #008cff;
+            }
+        }
+    </style>
+    
+    <!-- 引入Anton字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+</head>
+
+<body >
+<!-- 主标题区域 严格三行 + 呼吸背景 -->
+<section class="relative min-h-screen flex flex-col items-center justify-center px-4 z-10 overflow-hidden">
+    <!-- 纯黑底层背景 -->
+    <div class="fixed inset-0 bg-[#050509] -z-[110]"></div>
+    
+    <!-- 动态网格背景 -->
+    <div class="fixed inset-0 grid-bg -z-[105]"></div>
+    
+    <!-- 浮动几何装饰 -->
+    <div class="fixed inset-0 -z-[104]">
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+        <div class="floating-shape shape-3"></div>
+        <div class="floating-shape shape-4"></div>
+        <div class="floating-shape shape-5"></div>
+        <div class="floating-shape shape-6"></div>
+        <div class="floating-shape shape-7"></div>
+        <div class="floating-shape shape-8"></div>
+        <div class="floating-shape shape-9"></div>
+        <div class="floating-shape shape-10"></div>
+        <div class="floating-shape shape-11"></div>
+        <div class="floating-shape shape-12"></div>
+    </div>
+    
+    <!-- 光晕效果 -->
+    <div class="fixed top-1/4 left-1/4 glow-orb orb-1 -z-[103]"></div>
+    <div class="fixed bottom-1/3 right-1/4 glow-orb orb-2 -z-[103]"></div>
+    <div class="fixed top-1/2 right-1/3 glow-orb orb-3 -z-[103]"></div>
+    <div class="fixed top-1/3 right-1/5 glow-orb orb-4 -z-[103]"></div>
+    <div class="fixed bottom-1/4 left-1/3 glow-orb orb-5 -z-[103]"></div>
+    
+    <!-- 动态线条装饰 -->
+    <div class="fixed inset-0 -z-[102]">
+        <div class="glow-line line-1"></div>
+        <div class="glow-line line-2"></div>
+        <div class="glow-line line-3"></div>
+        <div class="glow-line line-4"></div>
+    </div>
+    
+    <!-- 星星背景 -->
+    <div class="fixed inset-0 -z-[100]" id="starsContainer"></div>
+    
+    <!-- 流星粒子 -->
+    <div class="fixed inset-0 -z-[99] overflow-hidden" id="meteorContainer"></div>
+    
+    <!-- 🔥 呼吸式霓虹背景（自动生效） -->
+    <div class="breathing-bg fixed -z-[98]"></div>
+    
+    <div class="text-center title-animate" id="titleContainer">
+        <div id="titlePlane">
+            <h1 class="leading-[0.9] tracking-tight font-black">
+                <!-- 第一行：Creativity 纯白发光 -->
+                <div class="text-white word-item text-[clamp(3.5rem,10vw,8rem)]">Creativity</div>
+
+                <!-- 第二行：Beyond 单独一行！蓝色渐变 -->
+                <div class="text-beyond-blue my-2 word-item text-[clamp(3rem,9vw,7rem)]">Beyond</div>
+
+                <!-- 第三行：All Domains! -->
+                <div class="flex justify-center items-baseline gap-4 word-item">
+                    <span class="text-stroke-brand text-[clamp(2rem,8vw,6rem)] hover-glow" id="allText">All</span>
+                    <span class="text-white text-[clamp(3.5rem,10vw,8rem)]">Domains!</span>
+                </div>
+            </h1>
+        </div>
+    </div>
+
+    <!-- 底部滚动箭头 -->
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+        <svg width="40" height="60" fill="none" stroke="#008cff" stroke-width="2" class="scroll-icon">
+            <rect x="10" y="10" width="20" height="30" rx="2" fill="none"/>
+            <path d="M20 25 L20 45 M15 40 L20 45 L25 40" fill="#008cff" stroke="#008cff"/>
+        </svg>
+    </div>
+</section>
+   
+
+    <!-- ==================== 第三部分：混合内容区 ==================== -->
+    <div class="gsap-container">
+        <!-- 横向滚动区 -->
+        <div class="horizontal-scroll-wrapper" id="scrollContainer">
+            <!-- 中间滚动容器 -->
+            <div class="horizontal-scroll-container" id="hScrollContainer">
+                <div class="section section-1">
+                    <div class="work-image center-image">
+                        <img src="zuopin/摄影.png" alt="摄影作品">
+                    </div>
+                </div>
+                <div class="section section-2">
+                    <div class="work-image center-image">
+                        <img src="zuopin/油画水果.png" alt="油画作品">
+                    </div>
+                </div>
+                <div class="section section-3">
+                    <div class="work-image center-image">
+                        <img src="zuopin/植物.png" alt="植物作品">
+                    </div>
+                </div>
+                <div class="section section-4">
+                    <div class="work-image center-image">
+                        <img src="zuopin/城市.png" alt="城市作品">
+                    </div>
+                </div>
+                <div class="section section-5">
+                    <div class="work-image center-image">
+                        <img src="zuopin/雪山风景.png" alt="雪山作品">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部标题容器 -->
+           <div class="bottom-text-box">
+    <div class="bottom-text">
+        <svg class="title_svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+            <!-- 保留原有的渐变定义（必须保留，否则没有紫色渐变描边） -->
+            <defs>
+                <linearGradient id="bottomGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#8c00ff"/>
+                    <stop offset="100%" style="stop-color:#ff00cc"/>
+                </linearGradient>
+            </defs>
+            
+            <!-- 你的新SVG路径：添加了class="svg-text"，修改了stroke和fill -->
+            <path 
+                class="svg-text"
+                d="M90.68 139.78C91.92 142.84 93.46 146.86 94.19 149.78L66.88 149.78L66.88 170.73C66.88 180.58 66.15 193.43 59.29 202.63C60.53 203.36 62.87 205.47 63.75 206.57C71.41 196.64 72.65 181.53 72.65 170.73L72.65 155.11L125.21 155.11L125.21 149.78L97.69 149.78L100.32 149.12C99.52 146.34 97.84 141.97 96.30 138.61ZM162.30 142.26L162.30 181.09L167.62 181.09L167.62 147.07L190.18 147.07L190.18 181.09L195.66 181.09L195.66 142.26ZM140.69 141.31C143.32 144.16 146.16 148.17 147.48 150.87L151.93 147.95C150.62 145.40 147.70 141.60 144.85 138.83ZM175.95 152.62L175.95 166.86C175.95 178.32 173.76 192.26 155.29 201.82C156.38 202.70 158.13 204.75 158.79 205.91C169.74 200.15 175.51 192.34 178.43 184.38L178.43 198.54C178.43 203.43 180.40 204.75 185.36 204.75L192.01 204.75C198.36 204.75 199.16 201.75 199.89 190.29C198.50 189.93 196.68 189.20 195.29 188.10C195.00 198.61 194.63 200.58 192.08 200.58L186.17 200.58C184.12 200.58 183.54 200 183.54 197.96L183.54 179.85L179.82 179.85C180.91 175.40 181.20 171.02 181.20 167.00L181.20 152.62ZM134.04 151.24L134.04 156.27L151.71 156.27C147.48 165.54 139.81 174.67 132.29 179.78C133.10 180.80 134.41 183.57 134.85 185.11C137.69 182.99 140.54 180.36 143.32 177.37L143.32 205.77L148.50 205.77L148.50 174.30C151.05 177.59 154.19 181.75 155.65 184.01L159.16 179.63C157.77 178.03 152.66 172.19 149.89 169.19C153.39 164.23 156.38 158.68 158.43 152.99L155.51 151.02L154.48 151.24ZM221.86 138.97C217.78 150.07 210.91 161.02 203.76 168.10C204.71 169.34 206.24 172.19 206.83 173.50C209.31 170.95 211.79 167.88 214.13 164.59L214.13 205.69L219.38 205.69L219.38 156.42C222.30 151.38 224.93 145.91 227.05 140.50ZM236.61 190.88C243.54 195.11 251.79 201.68 255.81 205.84L259.90 201.75C257.93 199.78 255.08 197.44 251.87 195.04C257.49 188.98 263.62 182.04 268.07 176.86L264.20 174.45L263.33 174.81L239.89 174.81L242.52 166.13L272.09 166.13L272.09 160.94L243.98 160.94L246.39 152.26L268.73 152.26L268.73 147.15L247.78 147.15L249.68 139.78L244.27 139.05L242.23 147.15L227.85 147.15L227.85 152.26L240.84 152.26L238.43 160.94L223.69 160.94L223.69 166.13L236.90 166.13C235.37 171.31 233.76 176.13 232.45 179.93L258.58 179.93C255.37 183.57 251.43 188.03 247.63 192.04C245.30 190.44 242.89 188.90 240.62 187.52ZM296.91 158.83C296.10 168.68 294.50 176.93 291.94 183.50C289.90 181.75 287.78 180.00 285.67 178.47C287.05 172.77 288.51 165.91 289.75 158.83ZM280.04 180.36C283.26 182.70 286.69 185.55 289.83 188.47C286.76 194.45 282.82 198.69 277.93 201.39C279.10 202.41 280.48 204.45 281.21 205.69C286.32 202.56 290.48 198.18 293.70 192.26C295.89 194.60 297.78 196.79 299.02 198.69L302.89 194.82C301.29 192.55 298.88 189.93 296.10 187.22C299.46 178.98 301.43 168.17 302.16 154.08L299.02 153.57L298.15 153.72L290.63 153.72C291.51 148.61 292.16 143.57 292.67 139.05L287.64 138.75C287.27 143.35 286.61 148.46 285.74 153.72L279.24 153.72L279.24 158.83L284.86 158.83C283.40 166.93 281.65 174.74 280.04 180.36ZM310.27 138.68L310.27 146.64L303.77 146.64L303.77 151.38L310.27 151.38L310.27 173.43L321.58 173.43L321.58 179.93L303.84 179.93L303.84 184.67L318.37 184.67C314.28 190.95 307.64 196.72 301.14 199.71C302.31 200.73 303.99 202.70 304.86 204.01C311.00 200.66 317.27 194.74 321.58 188.10L321.58 205.84L326.91 205.84L326.91 188.17C331.14 194.31 337.13 200.29 342.46 203.72C343.41 202.26 345.09 200.37 346.40 199.34C340.56 196.42 333.99 190.58 329.83 184.67L344.43 184.67L344.43 179.93L326.91 179.93L326.91 173.43L337.93 173.43L337.93 151.38L344.50 151.38L344.50 146.64L337.93 146.64L337.93 138.68L332.68 138.68L332.68 146.64L315.30 146.64L315.30 138.68ZM332.68 151.38L332.68 157.88L315.30 157.88L315.30 151.38ZM332.68 162.19L332.68 168.83L315.30 168.83L315.30 162.19Z"
+                fill="transparent"
+                stroke="url(#bottomGradient)"
+                stroke-width="1"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            />
+        </svg>
+    </div>
+</div>
+        </div>    
+
+
+
+        <!-- 作品列表展示区 -->
+        <div class="works-list-wrapper">
+
+            <div class="works-list">
+                <!-- 作品项 1 -->
+                <div class="work-item" data-img="D:\Trae CN\code\1\jimeng-ai-demo\cs\photos\photo (3).webp">
+                    <div class="work-number">01</div>
+                    <div class="work-content">
+                        <h2 class="work-title">第一个视频</h2>
+                        <p class="work-desc">+ 我是第一个视频 +</p>
+                    </div>
+                    <div class="work-date">2023.8</div>
+                </div>
+
+                <!-- 作品项 2 -->
+                <div class="work-item" data-img="D:\Trae CN\code\1\jimeng-ai-demo\cs\photos\photo (4).webp">
+                    <div class="work-number">02</div>
+                    <div class="work-content">
+                        <h2 class="work-title">第二个视频</h2>
+                        <p class="work-desc">+ 我是第二个视频 +</p>
+                    </div>
+                    <div class="work-date">2023.7</div>
+                </div>
+
+                <!-- 作品项 3 -->
+                <div class="work-item" data-img="D:\Trae CN\code\1\jimeng-ai-demo\cs\photos\photo (5).webp">
+                    <div class="work-number">03</div>
+                    <div class="work-content">
+                        <h2 class="work-title">第三个视频</h2>
+                        <p class="work-desc">+ 我是第三个视频 +</p>
+                    </div>
+                    <div class="work-date">2023.2</div>
+                </div>
+                <!-- 作品项 3 -->
+                <div class="work-item" data-img="D:\Trae CN\code\1\jimeng-ai-demo\cs\photos\photo (6).webp">
+                    <div class="work-number">04</div>
+                    <div class="work-content">
+                        <h2 class="work-title">第四个视频</h2>
+                        <p class="work-desc">+ 我是第四个视频 +</p>
+                    </div>
+                    <div class="work-date">2023.2</div>
+                </div>
+                <!-- 作品项 3 -->
+                <div class="work-item" data-img="D:\Trae CN\code\1\jimeng-ai-demo\cs\photos\photo (7).webp">
+                    <div class="work-number">05</div>
+                    <div class="work-content">
+                        <h2 class="work-title">第五个视频</h2>
+                        <p class="work-desc">+ 我是第五个视频 +</p>
+                    </div>
+                    <div class="work-date">2023.2</div>
+                </div>
+                <!-- 作品项 3 -->
+                <div class="work-item" data-img="D:\Trae CN\code\1\jimeng-ai-demo\cs\photos\photo (8).webp">
+                    <div class="work-number">06</div>
+                    <div class="work-content">
+                        <h2 class="work-title">第六个视频</h2>
+                        <p class="work-desc">+ 我是第六个视频 +</p>
+                    </div>
+                    <div class="work-date">2023.2</div>
+                </div>
+            </div>
+
+            <!-- 悬浮卡片 -->
+            <div class="floating-card" id="floatingCard">
+                <img src="" alt="" class="current">
+                <img src="" alt="" class="next">
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 第四部分：PHOTOS 扑克牌轮播区 ==================== -->
+
+<section class="poker-section min-h-screen flex flex-col items-center justify-center px-4 relative z-10">
+    <h1 class="main_title">PHOTOS</h1>
+    
+
+     <!-- 🔥 新增：外层布局容器 → 左右盒子 + 中间扑克牌 对称排列 -->
+    <div class="poker-layout">
+        <!-- 左侧红色盒子：点击跳转全部图片（按钮） -->
+        <a href="无限滑动-canvas.html" class="side-box left-box">
+            👉全部图片
+        </a>
+
+    <!-- 原有容器不动 -->
+    <div class="container" id="box">
+       
+        <!-- 🔥 新增：扑克牌包裹层（唯一修改） -->
+        <div class="poker-group">
+            <div class="poker poker1"><img src="cs/photos/photo (4).webp" alt=""></div>
+            <div class="poker poker2"><img src="cs/photos/photo (3).webp" alt=""></div>
+            <div class="poker poker3"><img src="cs/photos/photo (2).webp" alt=""></div>
+            <div class="poker poker4"><img src="cs/photos/photo (1).webp" alt=""></div>
+            <div class="poker poker5"><img src="cs/photos/photo (5).webp" alt=""></div>
+        </div>
+    </div>
+     <!-- 右侧红色盒子：纯文本框 -->
+        <div class="side-box right-box">
+            👈点击
+        </div>
+</div>
+    <div class="info_wrapper">
+        <p class="sub_title">你跟我说也没有用 我只是张图片</p>
+        <p class="copyright">2024 - 2026</p>
+    </div>
+</section>
+
+    <!-- 引入自定义 JS -->
+    <script src="script.js"></script>
+    <script src="scrollTextEffect.js"></script>
+  
+
+        <section class="contact-section relative min-h-screen flex flex-col items-center justify-center px-4 z-10 overflow-hidden">
+    <!-- 背景装饰 完全保留原有样式 -->
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,#008cff22_0%,transparent_70%)] pointer-events-none"></div>
+
+    <div class="text-center z-10 max-w-5xl w-full">
+        <!-- 标题&副标题 完全保留原有样式 -->
+        <h2 class="font-boldSans text-[clamp(2.5rem,8vw,6rem)] text-white mb-4 tracking-wider">
+            LET'S <span class="text-beyond-blue">TALK</span>
+        </h2>
+        <p class="text-gray-400 text-lg md:text-xl mb-12 font-sans">
+            有一个疯狂的想法？或者只是想打个招呼？随时联系我。
+        </p>
+
+        <!-- 核心布局优化：左半二维码 右半电话+地址 -->
+        <div class="flex flex-col md:flex-row gap-8 mb-16">
+            <!-- 左半部分：二维码卡片（桌面端占50%宽度，撑满全高） -->
+            <div class="w-full md:w-1/2 group relative p-8 border border-white/10 bg-white/5 hover:bg-brandBlue/10 hover:border-brandBlue/50 transition-all duration-500 overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-brandBlue/0 to-brandBlue/0 group-hover:from-brandBlue/20 transition-all duration-500"></div>
+                <div class="relative z-10 flex flex-col items-center justify-center h-full">
+                    <!-- 二维码占位：请替换为你的真实二维码图片路径 -->
+                    <div class="w-48 h-48 mx-auto mb-6 bg-white rounded-lg overflow-hidden">
+                        <img src="你的二维码图片路径.jpg" alt="扫码联系" class="w-full h-full object-contain">
+                    </div>
+                    <h3 class="text-white text-2xl font-bold mb-2">扫码联系</h3>
+                    <p class="text-gray-400 group-hover:text-white transition-colors">微信/公众号 一键咨询</p>
+                </div>
+            </div>
+
+            <!-- 右半部分：电话+地址 上下排列（桌面端占50%宽度，与左侧等高） -->
+            <div class="w-full md:w-1/2 flex flex-col gap-8">
+                <!-- 电话卡片 -->
+                <a href="tel:13800138000" class="flex-1 group relative p-8 border border-white/10 bg-white/5 hover:bg-brandBlue/10 hover:border-brandBlue/50 transition-all duration-500 overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-brandBlue/0 to-brandBlue/0 group-hover:from-brandBlue/20 transition-all duration-500"></div>
+                    <div class="relative z-10 h-full flex flex-col justify-center">
+                        <div class="text-brandBlue text-4xl mb-4">📞</div>
+                        <h3 class="text-white text-2xl font-bold mb-2">联系电话</h3>
+                        <p class="text-gray-400 group-hover:text-white transition-colors text-lg">138-0013-8000</p>
+                    </div>
+                </a>
+
+                <!-- 地址卡片 -->
+                <a href="https://maps.baidu.com/search/你的详细地址" target="_blank" class="flex-1 group relative p-8 border border-white/10 bg-white/5 hover:bg-brandBlue/10 hover:border-brandBlue/50 transition-all duration-500 overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-brandBlue/0 to-brandBlue/0 group-hover:from-brandBlue/20 transition-all duration-500"></div>
+                    <div class="relative z-10 h-full flex flex-col justify-center">
+                        <div class="text-brandBlue text-4xl mb-4">📍</div>
+                        <h3 class="text-white text-2xl font-bold mb-2">办公地址</h3>
+                        <p class="text-gray-400 group-hover:text-white transition-colors text-lg">河北省廊坊市广阳区xx路xx号</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 底部版权 完全保留原有样式 -->
+        <div class="border-t border-white/10 pt-8">
+            <p class="text-stroke-brand text-sm tracking-widest opacity-50">
+                © 2026 BE WILD CREATIVE. ALL RIGHTS RESERVED.
+            </p>
+        </div>
+    </div>
+</section>
+</body>
+</html>
