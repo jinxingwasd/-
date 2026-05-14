@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全部视频</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { 
+                        brandBlue: '#008cff',
+                        darkBg: '#050509'
+                    },
+                    fontFamily: {
+                        boldSans: ['Anton', 'Impact', 'sans-serif']
+                    },
+                }
+            }
+        }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #050509;
+            font-family: 'Anton', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* 视频卡片 */
+        .video-card {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.33, 1, 0.68, 1);
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(0,140,255,0.2);
+        }
+
+        .video-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 0 35px rgba(0,140,255,0.25);
+            border-color: rgba(0,140,255,0.4);
+        }
+
+        video {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            transition: all 0.3s ease;
+            top: 2rem; left: 2rem;
+        }
+
+        .back-btn:hover {
+            color: #fff;
+            text-shadow: 0 0 15px #008cff;
+        }
+
+        /* 视频标题 */
+        .video-title {
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        /* 视频描述 */
+        .video-desc {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.8;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-darkBg px-4 py-16">
+
+    <!-- 顶部返回按钮 - 固定在左上角 -->
+    <a href="index.html" class="fixed top-8 left-8 z-50 inline-flex items-center gap-2 text-brandBlue text-2xl hover:text-white hover:text-shadow-[0_0_15px_#008cff] transition-all duration-300">
+        ← 返回首页
+    </a>
+
+    <!-- 顶部标题 -->
+    <header class="max-w-6xl mx-auto mb-16 pt-16">
+        <h1 class="font-boldSans text-[clamp(3.5rem,10vw,8rem)] text-white leading-none tracking-tight">
+            ALL <span class="text-brandBlue">VIDEOS</span>
+        </h1>
+    </header>
+
+    <!-- 视频网格墙 -->
+    <div class="max-w-6xl mx-auto space-y-12">
+        <!-- 第一行：视频2 + 文字1 -->
+        <div class="flex flex-col md:flex-row gap-8 items-start">
+            <div class="video-card flex-1">
+                <video controls>
+                    <source src="/ship/2.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="flex-1 p-6">
+                <h3 class="video-title">视频1</h3>
+                <p class="video-desc">视频1的文字介绍内容...</p>
+            </div>
+        </div>
+
+        <!-- 第二行：视频1 + 文字2 -->
+        <div class="flex flex-col md:flex-row gap-8 items-start">
+            <div class="video-card flex-1">
+                <video controls>
+                    <source src="D:\Trae CN\code\1\jimeng-ai-demo\ship\fefbe148b0bb3bbc3424a49ea60005c4.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="flex-1 p-6">
+                <h3 class="video-title">视频2</h3>
+                <p class="video-desc">视频2的文字介绍内容...</p>
+            </div>
+        </div>
+
+        <!-- 第三行：视频3 -->
+        <div class="flex flex-col md:flex-row gap-8 items-start">
+            <div class="video-card flex-1">
+                <video controls>
+                    <source src="你的视频路径.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="flex-1 p-6">
+                <h3 class="video-title">视频3</h3>
+                <p class="video-desc">视频3的文字介绍内容...</p>
+            </div>
+        </div>
+
+        <!-- 第四行：视频4 -->
+        <div class="flex flex-col md:flex-row gap-8 items-start">
+            <div class="video-card flex-1">
+                <video controls>
+                    <source src="你的视频路径.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="flex-1 p-6">
+                <h3 class="video-title">视频4</h3>
+                <p class="video-desc">视频4的文字介绍内容...</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="max-w-6xl mx-auto mt-24 text-center text-brandBlue opacity-60 text-lg tracking-widest">
+        2024 – 2026 ALL RIGHTS RESERVED
+    </footer>
+
+</body>
+</html>
